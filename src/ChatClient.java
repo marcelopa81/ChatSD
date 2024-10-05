@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ChatUI {
+public class ChatClient {
 	private static PrintWriter output;
 	private static BufferedReader input;
     private static JTextArea chatArea;
