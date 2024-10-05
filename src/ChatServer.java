@@ -1,7 +1,13 @@
-import java.io.*;
-import java.net.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class ChatServer {
     private static List<ClienteHandler> clientes = new ArrayList<>();
@@ -32,6 +38,7 @@ public class ChatServer {
         System.out.println("Cliente " + cliente.getNome() + " saiu.");
     }
 
+
     static class ClienteHandler extends Thread {
     	private Socket clientSocket;
         private PrintWriter out;
@@ -44,17 +51,31 @@ public class ChatServer {
 
         public void run() {
             try {
-            	input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
 
                 out.println("Digite seu nome:");
                 nome = input.readLine();
 
+                // Se o nome for nulo ou vazio, encerrar a conexão
+                if (nome == null || nome.trim().isEmpty()) {
+                    out.println("Nome inválido. Conexão encerrada.");
+                    return;
+                }
+
+                // Notifica que o cliente entrou
                 ChatServer.broadcast("[" + new Date() + "] " + nome + " entrou na sala.", this);
 
                 String mensagem;
                 while ((mensagem = input.readLine()) != null) {
-                   ChatServer.broadcast("[" + new Date() + "]: " + nome + ": " + mensagem, this);
+                	// Verifica se a mensagem é um ping
+                    if (mensagem.equals("PING")) {
+                        out.println("PONG"); // Responde ao ping
+                		System.out.println("PONG");
+                	} else {
+                		 ChatServer.broadcast("[" + new Date() + "]: " + nome + ": " + mensagem, this);
+                	}
+                   
                 }
 
             } catch (IOException e) {
@@ -65,10 +86,13 @@ public class ChatServer {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                removerCliente(this);
-                ChatServer.broadcast("[" + new Date() + "]: " + nome + " saiu da sala.", this);
+                // Remove o cliente e garante que a mensagem de saída seja apropriada
+                ChatServer.removerCliente(this);
+                ChatServer.broadcast(nome + " saiu do chat!", this);
             }
         }
+
+
 
         public String getNome() {
             return nome;

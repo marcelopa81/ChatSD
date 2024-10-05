@@ -11,6 +11,7 @@ public class ChatUI {
 	private static PrintWriter output;
 	private static BufferedReader input;
     private static JTextArea chatArea;
+    private boolean conectado = true;
 
     public void main(String[] args) {
         JFrame frame = new JFrame("Chat");
@@ -52,12 +53,20 @@ public class ChatUI {
 
         // Mostra a janela
         frame.setVisible(true);
+        
+        String serverAddress = JOptionPane.showInputDialog(frame, "Informe o IP do Servidor:", 
+        		"Conectar ao Servidor", JOptionPane.PLAIN_MESSAGE);
+        int port = Integer.parseInt(JOptionPane.showInputDialog(frame, "Informe a Porta do Servidor:", 
+        		"Conectar ao Servidor", JOptionPane.PLAIN_MESSAGE));
 
         // Conecta ao servidor
         conectarServidor();
         
         // Inicia uma thread para receber mensagens do servidor
         new Thread(() -> receberMensagens()).start();
+        
+     // Inicia uma thread para enviar ping ao servidor a cada 5 segundos
+        new Thread(this::verificarServidorComPing).start();
     }
 
     // Método para conectar ao servidor
@@ -88,6 +97,19 @@ public class ChatUI {
             }
         } catch (IOException e) {
             chatArea.append("Erro ao receber mensagens do servidor.\n");
+        }
+    }
+    
+ // Método para verificar o servidor com ping a cada 15 segundos
+    private void verificarServidorComPing() {
+        while (conectado) {
+            try {
+                Thread.sleep(15000); // Espera 15 segundos entre pings
+                output.println("PING"); // Envia o comando PING para o servidor
+
+            } catch (InterruptedException e) {
+                chatArea.append("Erro na verificação do servidor.\n");
+            }
         }
     }
 }
