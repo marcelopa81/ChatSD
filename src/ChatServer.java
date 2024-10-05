@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,7 +36,8 @@ public class ChatServer {
 
     public static void removerCliente(ClienteHandler cliente) {
         clientes.remove(cliente);
-        System.out.println("Cliente " + cliente.getNome() + " saiu.");
+        String currentTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
+        System.out.println(currentTime + " Cliente " + cliente.getNome() + " saiu.");
     }
 
 
@@ -64,7 +66,9 @@ public class ChatServer {
                 }
 
                 // Notifica que o cliente entrou
-                ChatServer.broadcast("[" + new Date() + "] " + nome + " entrou na sala.", this);
+                String currentTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
+                ChatServer.broadcast("["+ currentTime + "] " + nome + " entrou na sala.", this);
+                //ChatServer.broadcast("[" + new Date() + "] " + nome + " entrou na sala.", this);
 
                 String mensagem;
                 while ((mensagem = input.readLine()) != null) {
@@ -73,7 +77,7 @@ public class ChatServer {
                         out.println("PONG"); // Responde ao ping
                 		System.out.println("PONG");
                 	} else {
-                		 ChatServer.broadcast("[" + new Date() + "]: " + nome + ": " + mensagem, this);
+                        ChatServer.broadcast("[" + currentTime + "] " + nome + ": " + mensagem, this);
                 	}
                    
                 }
@@ -88,7 +92,8 @@ public class ChatServer {
                 }
                 // Remove o cliente e garante que a mensagem de saída seja apropriada
                 ChatServer.removerCliente(this);
-                ChatServer.broadcast(nome + " saiu do chat!", this);
+                String currentTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
+                ChatServer.broadcast("[" + currentTime + "] " + nome + " saiu do chat!", this);
             }
         }
 

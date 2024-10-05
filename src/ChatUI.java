@@ -85,7 +85,7 @@ public class ChatUI {
     private static void enviarMensagem(String message) {
     	String currentTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
         output.println(message);
-        chatArea.append(String.format("[%s]: Você: %s \n",currentTime, message));
+        chatArea.append(String.format("[%s] Você: %s \n", currentTime, message));
     }
 
     // Método para receber mensagens do servidor
